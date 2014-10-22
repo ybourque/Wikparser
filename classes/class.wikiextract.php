@@ -1,116 +1,126 @@
 <?php
+/***********************************************************************************/
+// Gets all raw text for a given word via either Wiktionary's API or a local MySQL
+// copy (defined in conc.php). Accepts 3 variables:
+// $word = string
+// $langCode = string (2-letter language code)
+// $wikiSource = string (either 'api' or 'local' for local MySQL).
+/***********************************************************************************/
 
 class WikiExtract {
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Variables
-// These are the records and tables found in the wiktionary database when dumped and
-// loaded into a mysql database using the Wikimedia mwdumper.
-/////////////////////////////////////////////////////////////////////////////////////		
-	private $page_id_record = "page_id";
-	private $page_title_record = "page_title";
-	private $page_namespace_record = "page_namespace";
-	private $page_table = "page";
+/***********************************************************************************/
+	private $wikiSource; // api or local
+	private $langCode; // 2-letter language code
 	
-	private $rev_text_id_record = "rev_text_id";
-	private $rev_page_record = "rev_page";
-	private $revision_table = "revision";
-	
-	private $old_text_record = "old_text";
-	private $old_id_record = "old_id";
-	private $text_table = "text";
-	
-	private $word; 		// Search word passed from user input
-	private $wikitext;	// Query results to be parsed
-	private $langcode;	// Language code (en, fr, etc.)
-	
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // construct
-/////////////////////////////////////////////////////////////////////////////////////	
-	public function __construct($word, $wikisource, $langcode) {
-		$this->langcode = $langcode;
-		if ($wikisource == 'local') {
-			$this->connectToSql();
-			$this->wikitext = $this->sqlFetchData($word);
-		}
-		else if ($wikisource == 'api') {
-			$this->wikitext = $this->getWikiTextFromWiktionary($word);
-		}
+/***********************************************************************************/
+	public function __construct($langCode, $wikiSource) {
+		$this->langCode = $langCode;
+		$this->wikiSource = $wikiSource;
+		include './language.config.php';
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+	
+/***********************************************************************************/
 // public methods
-/////////////////////////////////////////////////////////////////////////////////////
-	public function getWikiText () {
-		return $this->wikitext;
+/***********************************************************************************/
+	public function get_wikitext ($word) {
+		if ($this->wikiSource == 'local') {
+			$wikitext = $this->sql_fetch_data($word);
+		}
+		else if ($this->wikiSource == 'api') {
+			$wikitext = $this->get_wikitext_from_wiktionary($word);
+		}
+		
+		return $this->lang_extract($wikitext);
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // private methods
-/////////////////////////////////////////////////////////////////////////////////////
-	private function connectToSql() {
-		include 'conc.php';
-	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
+
+/***********************************************************************************/
 // Retrieves raw data via Wiktionary's API.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function getWikiTextFromWiktionary($word) {
-		$this->word = urlencode($word);
+/***********************************************************************************/
+	private function get_wikitext_from_wiktionary($word) {
+		$word = urlencode($word);
 	
 	// Must be supplied, otherwise IP will be banned
-		$useragent = "Wikitionary Text Parser 0.2 (http://www.igrec.ca/projects)";
+		$userAgent = "Wikitionary Text Parser 0.3 (http://www.igrec.ca/projects)";
 	// Paramaters passed to the Wik API, including search word.	
-		$params = '?action=parse&prop=wikitext&page='.$this->word.'&format=xml';
+		$params = '?action=parse&prop=wikitext&page='.$word.'&format=xml';
 		
-		$ch = curl_init('http://'.$this->langcode.'.wiktionary.org/w/api.php'.$params);
-		curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+		$ch = curl_init('http://'.$this->langCode.'.wiktionary.org/w/api.php'.$params);
+		curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch,CURLOPT_ENCODING , "gzip");
 		
-		$wikiapiresult = curl_exec($ch);
+		$wikiAPIResult = curl_exec($ch);
 		curl_close($ch);
 
-		if (strpos($wikiapiresult, "error code=\"missingtitle\"") !== false) {
-			die("No such word.");
+		if (strpos($wikiAPIResult, "error code=\"missingtitle\"") !== false) {
+			die("ERROR: The Wiktionary API did not return a page for that word.");
 		}
 		else {
-			return $wikiapiresult;
+			return $wikiAPIResult;
 		}
 	}		
-/////////////////////////////////////////////////////////////////////////////////////	
-	private function sqlFetchData($word) {
-		$word = mysql_real_escape_string($word);
+/***********************************************************************************/
+// Retrieves raw data via a local MySQL copy of Wiktionary (defined in conc.php).
+/***********************************************************************************/
+	private function sql_fetch_data($word) {
 		
-	// Fetch page_id based on word.
-		$pageIdQuery = "SELECT $this->page_id_record FROM $this->page_table 
-			WHERE $this->page_title_record = '$word' AND $this->page_namespace_record = 0";
-
-		$pageIdResult = mysql_query($pageIdQuery)
-			or die(mysql_error("No page ID found."));
-
-		$row = mysql_fetch_array($pageIdResult);
-		$pageId = $row[$this->page_id_record];
-
-	// Fetch revision id based on page_id.	
-		$revTextIdQuery = "SELECT $this->rev_text_id_record FROM $this->revision_table 
-			WHERE $this->rev_page_record = '$pageId'";
-
-		$revTextIdResult = mysql_query($revTextIdQuery)
-			or die(mysql_error("No Revision Text ID found."));
-
-		$row2 = mysql_fetch_array($revTextIdResult);
-		$revTextId = $row2[$this->rev_text_id_record];
-
-	// Fetch word text based on revision id.
-		$oldTextQuery = "SELECT $this->old_text_record FROM $this->text_table 
-			WHERE $this->old_id_record = '$revTextId'";
-
-		$oldTextResult = mysql_query($oldTextQuery)
-			or die(mysql_error("No Old Text found."));
-
-		$row3 = mysql_fetch_array($oldTextResult);
-		$wikitext = $row3[$this->old_text_record] or die("No such word.");
+		include 'conc.php';
+		$word = mysqli_real_escape_string($conn, $word);
+	
+	// 3 tables are used page->revision->text	
+		$query = "SELECT t.old_text FROM text t ";
+		$query .= "JOIN revision r ON r.rev_text_id = t.old_id ";
+		$query .= "JOIN page p ON r.rev_page = p.page_id ";
+		$query .= "WHERE p.page_title = '$word' AND p.page_namespace = 0";
 		
-		return $wikitext;
+		if (!$queryResult = $conn->query($query)) {
+			die("Error: Couldn't query word.");
+		}
+		
+		if ($queryResult->num_rows > 0) {
+			while ($row = $queryResult->fetch_assoc()){
+				$wikitext = $row['old_text'];
+			}
+			return $wikitext;
+		}
+		else {
+			die("No such word found.");
+		}				
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
+// Extracts content for specified language from raw wiktionary data. Some entries
+// contain text for other languages.
+/***********************************************************************************/
+	private function lang_extract($wikitext){
+		$bln = false;
+		
+		if ($this->langSeparator !== "") {
+			$languages = explode($this->langSeparator, $wikitext);
+		
+			foreach ($languages as $value) {
+				if (strpos($value, $this->langHeader) !== false) {
+					$wikitext = $value;
+					$bln = true;
+				}
+			}
+			if ($bln !== true) {
+				die("No such word for specified language.");
+			}
+			else {
+				return $wikitext;
+			}
+		}
+		else {
+			return $wikitext;
+		}
+	}
 }
 
 ?>
