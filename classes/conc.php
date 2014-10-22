@@ -1,18 +1,20 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Change the values for these variables according to the naming scheme of your own
-// copy of the sql of Wiktionary.
-/////////////////////////////////////////////////////////////////////////////////////
-	$dbhost = 'localhost';
-	$dbuser = 'wiktionary';
-	$dbpass = 'wikpass';
-	$dbname = 'wiktionary';
+// SQL copy of Wiktionary.
+/***********************************************************************************/
+	$dbHost = 'hostname'; // e.g. localhost
+	$dbUser = 'username';
+	$dbPass = 'password';
+	$dbName = 'database';
 	
-/////////////////////////////////////////////////////////////////////////////////////	
-	@$conn = mysql_connect($dbhost, $dbuser, $dbpass) or die
-		('Error connecting to mysql.');
-
-	mysql_select_db($dbname);
-	mysql_set_charset('utf8');
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
+	$conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+	
+	if ($conn->connect_errno > 0) {
+		die("Unable to connect to database [".$conn->connect_error."].");
+	}
+	
+	mysqli_set_charset($conn, 'utf8');
+/***********************************************************************************/
 ?>
