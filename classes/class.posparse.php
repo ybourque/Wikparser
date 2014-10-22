@@ -1,100 +1,77 @@
 <?php
-
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // This class is used to parse the wikitionary raw data in order to extract parts
 // of speech for a given word.
 // See the language.config.php file for setting language specific parameters.
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 
 class PosParse {
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Variables
-/////////////////////////////////////////////////////////////////////////////////////
-	private $count;				// part of speech, used to limit number of POS returned
-	private $posmatchtype;		// set to either preg pattern or array with values
-	private $posresults;		// extracted parts of speech for a given word
-	private $posextrastring;	// bits of string that surrounds pos (must be constant, i.e. "=")
+/***********************************************************************************/
+	private $langCode;			// language code (e.g. en, fr, da, etc.)
 	
-	private $langheader;		// string that identifies language in a wiktionary entry
-	private $langseparator;		// string that separates language sections
-	private $langcode;			// language code (e.g. en, fr, da, etc.)
-	
-// Preg pattern for pos. Set in switch function for whatever language you're working with.
-	private $pospattern;
-	
-// Array for pos. Set in switch function for whatever language you're working with.
-	private $posarray;
-	
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // construct
-/////////////////////////////////////////////////////////////////////////////////////
-	public function __construct($wikitext, $langcode, $count) {
-		$this->count = $count;
-		$this->langcode = urlencode($langcode);
-		$this->setLangParam($this->langcode);
-
-		$this->extractTextLang($wikitext);
-		
-		$this->posresults = $this->extractPos();
+/***********************************************************************************/
+	public function __construct($langCode) {
+		$this->langCode = $langCode;
+	// Set language variables.	
+		include './language.config.php';
+		if (empty($this->posMatchType) || (empty($this->posPattern) && empty($this->posArray))) {
+			die("ERROR: POS parameters are not set correctly for this language in language.config.php.");
+		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // public methods; used to retrieve contents of variables
-/////////////////////////////////////////////////////////////////////////////////////
-	public function getLangHeader() {
-		return $this->langheader;
-	}	
-	public function getPosResults() {
-		return $this->posresults;
+/***********************************************************************************/
+	public function get_pos($wikitext, $count) {
+		$posArray = $this->extract_pos($wikitext, $count);
+		
+		include "./classes/class.strip.tags.php";
+		$stripTagsObject = new StripTags();
+		
+		$posArray = $stripTagsObject->strip_tags($posArray, $this->langCode);
+		return array_unique($posArray);
 	}
-	public function getWord() {
-		return $this->word;
-	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // private methods
-/////////////////////////////////////////////////////////////////////////////////////
-// Extracts text based on set language header and separator.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractTextLang($wikitext) {
-		include 'extracttextlang.php';
-	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
+
+/***********************************************************************************/
 // Extracts every occurrence of a part of speech.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractPos() {
-		$tempposresults = array();
+/***********************************************************************************/
+	private function extract_pos($wikitext, $count) {
+		$tempPosResults = array();
 		
 	// If the matches are in an array
-		if ($this->posmatchtype == "array") {
-			foreach ($this->posarray as $value) {
-				if (strpos($this->wikitext, $value)) {
-					$tempposresults[] = str_replace($this->posextrastring, "", $value);
+		if ($this->posMatchType == "array") {
+			foreach ($this->posArray as $value) {
+				if (strpos($wikitext, $value)) {
+					$tempPosResults[] = str_replace($this->posExtraString, "", $value);
 				}
 			}		
 		}		
 	// Else if the matches are part of a regular expression
-		else if ($this->posmatchtype == "preg") {
-			preg_match_all($this->pospattern, $this->wikitext, $matches);
+		else if ($this->posMatchType == "preg") {
+			preg_match_all($this->posPattern, $wikitext, $matches);
 			if (empty($matches[0]) !== true) {
 				foreach ($matches[0] as $value) {
-					$tempposresults[] = $value;
+					$tempPosResults[] = str_replace($this->posExtraString, "", $value);
 				}
-			// Remove values based on the count provide by the user.	
-				$tempposresults = array_slice($tempposresults, 0, $this->count);
 			}
 		}
+		else {
+			die("No POS type (preg or array) specified.");
+		}
+		
 	// Return results if array not empty.	
-		if (empty($tempposresults) !==true) {
-			return $tempposresults;
+		if (empty($tempPosResults) !== true) {
+			return array_slice($tempPosResults, 0, $count);
 		}
 		else {
 			die("No POS found.");
 		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Switch for language parameters.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function setLangParam($langcode) {
-		include './language.config.php';
-	}
-/////////////////////////////////////////////////////////////////////////////////////				
+/***********************************************************************************/
 } // End of class

@@ -1,49 +1,53 @@
 <?php
+/***********************************************************************************/
+// This class is used to parse the wikitionary raw data in order to extract synonyms
+// for a given word. Synonyms are not systematically included in Wiktionary entries.
+// See the language.config.php file for setting language specific parameters.
+/***********************************************************************************/
 
 class SynParse {
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Variables
-/////////////////////////////////////////////////////////////////////////////////////
-	private $synheader;
-	private $synarray;
-
-	private $langheader;
-	private $langseparator;
+/***********************************************************************************/
+	private $langCode;	// language code (e.g. en, fr, da, etc.)
 	
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // construct
-/////////////////////////////////////////////////////////////////////////////////////
-	public function __construct($wikitext, $langcode, $count) {
-		$this->setLangParam($langcode);
-		$this->extractTextLang($wikitext);
-		$this->synarray = $this->extractSyn($count);
-		$this->synarray = $this->stripTags();
+/***********************************************************************************/
+	public function __construct($langCode) {
+		$this->langCode = $langCode;
+	// Set language variables.	
+		include './language.config.php';
+		if (empty($this->synHeader)) {
+			die("ERROR: Synonym parameter is not set for this language in language.config.php.");
+		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // public methods
-/////////////////////////////////////////////////////////////////////////////////////
-	public function getSyn() {
-		return $this->synarray;
+/***********************************************************************************/
+	public function get_syn($wikitext, $count) {
+		$synArray = $this->extract_syn($wikitext, $count);
+		return $this->strip_tags($synArray);
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // private methods
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Extracts synonyms from wikitext
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractSyn($count) {
-		$synstring = null;	
-		$synpattern = "/$this->synheader.*?\n\n/us";
-		$itempattern = "/\[\[.*?\]\]/u";
+/***********************************************************************************/
+	private function extract_syn($wikitext, $count) {
+		$synString = null;	
+		$synPattern = "/$this->synHeader.*?\n\n/us";
+		$itemPattern = "/\[\[.*?\]\]/u";
 	
 	// If pattern returns results, then extract synonyms
-		if (preg_match_all($synpattern, $this->wikitext, $synmatch, PREG_PATTERN_ORDER) > 0) {
+		if (preg_match_all($synPattern, $wikitext, $synMatch, PREG_PATTERN_ORDER) > 0) {
 		// There may be more than one synonym section. Fuse them together as string.
-			foreach ($synmatch[0] as $value) {
-				$synstring .= $value;
+			foreach ($synMatch[0] as $value) {
+				$synString .= $value;
 			}
 		// Match all double-bracketed words ([[...]])
-			if (preg_match_all($itempattern, $synstring, $itemmatch, PREG_PATTERN_ORDER) > 0) {
-				return array_slice($itemmatch[0], 0, $count);
+			if (preg_match_all($itemPattern, $synString, $itemMatch, PREG_PATTERN_ORDER) > 0) {
+				return array_slice($itemMatch[0], 0, $count);
 			}
 			else {
 				die("No synonyms could be identified.");
@@ -53,31 +57,20 @@ class SynParse {
 			die("No listed synonyms.");
 		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Removes unnecessary string elements from results
-/////////////////////////////////////////////////////////////////////////////////////
-	private function stripTags() {
-		$strippedarray = $this->synarray;
+/***********************************************************************************/
+	private function strip_tags($synArray) {
+		$strippedArray = $synArray;
 	// Remove first half of entries such as [[...:word]]
-		$strippedarray = preg_replace("/\[\[.*?[|:]/u", "", $strippedarray);
+		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);
 	// Remove brackets [[
-		$strippedarray = str_replace("[[", "", $strippedarray);
+		$strippedArray = str_replace("[[", "", $strippedArray);
 	// Remove brackets ]]
-		$strippedarray = str_replace("]]", "", $strippedarray);
+		$strippedArray = str_replace("]]", "", $strippedArray);
 
-		return $strippedarray;
+		return $strippedArray;
 	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Extracts text based on set language header and separator.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractTextLang($wikitext) {
-		include 'extracttextlang.php'; // Sets $this->wikitext
-	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Switch for language parameters.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function setLangParam($langcode) {
-		include './language.config.php';
-	}
+/***********************************************************************************/
 } // End of class
 ?>

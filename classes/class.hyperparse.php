@@ -1,55 +1,53 @@
 <?php
-
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // This class is used to parse the wikitionary raw data in order to extract hypernyms
-// for a given word. Hypernyms are infrequently included in Wiktionary entries.
+// for a given word. Hypernyms are infrequent in Wiktionary entries.
 // See the language.config.php file for setting language specific parameters.
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 
 class HyperParse {
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Variables
-/////////////////////////////////////////////////////////////////////////////////////
-	private $hyperheader;
-	private $hyperarray;
-
-	private $langheader;
-	private $langseparator;
+/***********************************************************************************/
+private $langCode;	// language code (e.g. en, fr, da, etc.)
 	
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // construct
-/////////////////////////////////////////////////////////////////////////////////////
-	public function __construct($wikitext, $langcode, $count) {
-		$this->setLangParam($langcode);
-		$this->extractTextLang($wikitext);
-		$this->hyperarray = $this->extractHyper($count);
-		$this->hyperarray = $this->stripTags();
+/***********************************************************************************/
+	public function __construct($langCode) {
+		$this->langCode = $langCode;
+	// Set language variables.	
+		include './language.config.php';
+		if (empty($this->hyperHeader)) {
+			die("ERROR: Hypernym parameter is not set for this language in language.config.php.");
+		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // public methods
-/////////////////////////////////////////////////////////////////////////////////////
-	public function getHyper() {
-		return $this->hyperarray;
+/***********************************************************************************/
+	public function get_hyper($wikitext, $count) {
+		$hyperArray = $this->extract_hyper($wikitext, $count);
+		return $this->strip_tags($hyperArray);
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // private methods
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Extracts hypernyms from wikitext
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractHyper($count) {
-		$hyperstring = null;	
-		$hyperpattern = "/$this->hyperheader.*?\n\n/us";
-		$itempattern = "/\[\[.*?\]\]/u";
+/***********************************************************************************/
+	private function extract_hyper($wikitext, $count) {
+		$hyperString = null;	
+		$hyperPattern = "/$this->hyperHeader.*?\n\n/us";
+		$itemPattern = "/\[\[.*?\]\]/u";
 	
 	// If pattern returns results, then extract hypernyms
-		if (preg_match_all($hyperpattern, $this->wikitext, $hypermatch, PREG_PATTERN_ORDER) > 0) {
+		if (preg_match_all($hyperPattern, $wikitext, $hyperMatch, PREG_PATTERN_ORDER) > 0) {
 		// There may be more than one hypernym section. Fuse them together as string.
-			foreach ($hypermatch[0] as $value) {
-				$hyperstring .= $value;
+			foreach ($hyperMatch[0] as $value) {
+				$hyperString .= $value;
 			}
 		// Match all double-bracketed words ([[...]])
-			if (preg_match_all($itempattern, $hyperstring, $itemmatch, PREG_PATTERN_ORDER) > 0) {
-				return array_slice($itemmatch[0], 0, $count);
+			if (preg_match_all($itemPattern, $hyperString, $itemMatch, PREG_PATTERN_ORDER) > 0) {
+				return array_slice($itemMatch[0], 0, $count);
 			}
 			else {
 				die("No hypernyms could be identified.");
@@ -59,31 +57,20 @@ class HyperParse {
 			die("No listed hypernyms.");
 		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Removes unnecessary string elements from results
-/////////////////////////////////////////////////////////////////////////////////////
-	private function stripTags() {
-		$strippedarray = $this->hyperarray;
+/***********************************************************************************/
+	private function strip_tags($hyperArray) {
+		$strippedArray = $hyperArray;
 	// Remove first half of entries such as [[...:word]]
-		$strippedarray = preg_replace("/\[\[.*?[|:]/u", "", $strippedarray);
+		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);
 	// Remove brackets [[
-		$strippedarray = str_replace("[[", "", $strippedarray);
+		$strippedArray = str_replace("[[", "", $strippedArray);
 	// Remove brackets ]]
-		$strippedarray = str_replace("]]", "", $strippedarray);
+		$strippedArray = str_replace("]]", "", $strippedArray);
 
-		return $strippedarray;
+		return $strippedArray;
 	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Extracts text based on set language header and separator.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractTextLang($wikitext) {
-		include 'extracttextlang.php'; // Sets $this->wikitext
-	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Switch for language parameters.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function setLangParam($langcode) {
-		include './language.config.php';
-	}
+/***********************************************************************************/
 } // End of class
 ?>

@@ -1,88 +1,88 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // This class is used to extract all definitions for a word.
 // See the language.config.php file for setting language specific parameters.
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 
 class DefParse {
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Variables
-/////////////////////////////////////////////////////////////////////////////////////	
-	private $defarray;
-	private $langcode;
-	private $count;
+/***********************************************************************************/
+	private $langCode;	// language code (e.g. en, fr, da, etc.)
 	
-	private $deftag;
-	private $exampletag;
-	private $langheader;
-	private $langseparator;
-	
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // construct
-/////////////////////////////////////////////////////////////////////////////////////	
-	public function __construct($wikitext, $langcode, $count) {
-		$this->setLangParam($langcode);
-		$this->extractTextLang($wikitext);
-		$this->defarray = $this->extractDef($this->wikitext, $count);
-		$this->defarray = $this->stripTags();
+/***********************************************************************************/
+	public function __construct($langCode) {
+		$this->langCode = $langCode;
+	// Set language variables.	
+		include './language.config.php';
+		if (empty($this->defHeader) && empty($this->defTag)) {
+			die("ERROR: Definition parameters are not set for this language in language.config.php.");
+		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // public methods
-/////////////////////////////////////////////////////////////////////////////////////
-	public function getDef() {
-		return $this->defarray;
+/***********************************************************************************/
+	public function getDef($wikitext, $count) {
+		$defArray = $this->extract_def($wikitext, $count);
+		return $this->strip_tags($defArray);
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // private methods
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Extracts all definitions by splitting at new lines and matching for definition
 // tags set in paramaters.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractDef($wikitext, $count) {
-		$defarray = array();
+/***********************************************************************************/
+	private function extract_def($wikitext, $count) {
+		$defArray = array();
 
-		$explodenewline = preg_split("/\n|\r/", $wikitext);
-		foreach ($explodenewline as $value) {
-			if (strpos($value, $this->deftag) === 0) {
-				$defarray[] = $value;
+		if (!empty($this->defHeader)) {
+			$sectionPattern = "(".preg_quote($this->defHeader).".*?\n\n)s";
+		// Find all matches for header + text until double newline.	
+			preg_match_all($sectionPattern, $wikitext, $sectionMatches);
+			if ($sectionMatches) {
+				$defPattern = "/\n".str_replace(" ", "\s", preg_quote($this->defTag)).".*/";
+				foreach ($sectionMatches[0] as $value) {
+				// Find all matches for deftag + text until newline.	
+					preg_match_all($defPattern, $value, $defMatches);
+					if ($defMatches) {
+						foreach ($defMatches[0] as $value) {
+							$defArray[] = $value;
+						}
+					}
+				}
+				return array_slice($defArray, 0, $count);
+			}
+			else {
+				die("No definitions section found.");
 			}
 		}
-		if (empty($defarray) !== true) {
-			$defarray = array_slice($defarray, 0, $count);
-			return $defarray;
-		}
-		else {
-			die("No definitions found for specified word.");
+		else {		
+			$defPattern = "/\n".str_replace(" ", "\s", preg_quote($this->defTag)).".*/";
+			preg_match_all($defPattern, $wikitext, $matches);
+			if ($matches) {
+				return array_slice($matches[0], 0, $count);
+			}
 		}
 	}
-/////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Strips tags used for additional info and links to other words.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function stripTags() {
+/***********************************************************************************/
+	private function strip_tags($defArray) {
 	// Strip anything enclosed between {{ }}
-		$strippedarray = preg_replace('(\{\{.*?\}\})', "", $this->defarray);
+		$strippedArray = preg_replace('(\{\{.*?\}\})', "", $defArray);
 	// Remove 1st half of [[word|Word]] strings.
-		$strippedarray = preg_replace('(\[\[[^\]]*?\|)u', "", $strippedarray);
+		$strippedArray = preg_replace('(\[\[[^\]]*?\|)u', "", $strippedArray);
 	// Remove brackets [[
-		$strippedarray = str_replace("[[", "", $strippedarray);
+		$strippedArray = str_replace("[[", "", $strippedArray);
 	// Remove brackets ]]
-		$strippedarray = str_replace("]]", "", $strippedarray);
+		$strippedArray = str_replace("]]", "", $strippedArray);
 	// Remove definition identifier
-		$strippedarray = str_replace($this->deftag, "", $strippedarray);
+		$strippedArray = str_replace($this->defTag, "", $strippedArray);
 		
-		return $strippedarray;
+		return $strippedArray;
 	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Extracts text based on set language header and separator.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function extractTextLang($wikitext) {
-		include 'extracttextlang.php'; // Sets $this->wikitext
-	}
-/////////////////////////////////////////////////////////////////////////////////////
-// Switch for language parameters.
-/////////////////////////////////////////////////////////////////////////////////////
-	private function setLangParam($langcode) {
-		include './language.config.php';
-	}
+/***********************************************************************************/
 } // End of class.
 ?>
