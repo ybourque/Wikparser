@@ -1,37 +1,39 @@
 <?php
-////////////////////////////////////////////////////////////////////////////////////
-// Wikitionary Text Parser 0.2c
+/***********************************************************************************/
+// Wikitionary Text Parser 0.3
 // Author: Yves Bourque
 // Go to http://www.igrec.ca/projects/ for full instructions.
-////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 	header('Content-type: text/html; charset=utf-8');
 
-////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Set variables. Valid values as follows:
 // *word: any string
-// *query: 'pos', 'def', 'syn', 'hyper'
-// lang: 'en', 'fr' -- other code as set in the config file
+// *query: 'pos', 'def', 'syn', 'hyper', 'gender'
+// lang: 'en', 'fr', 'es', 'de' -- other codes as set in the config file
 // count: any number > 0
 // source: 'local' for local wiki mysql database, 'api' for Wiktionary's api (slow)
-////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 
 // search word
-		@$word = $_GET['word'] or die("Error: You must specify a search string.");
-////////////////////////////////////////////////////////////////////////////////////
+		@$word = $_GET['word']
+		or die("ERROR: You must specify a search string. Append ?word=WORD
+		to the end of the URL.");
+/***********************************************************************************/
 
 // query type; 'pos' for part of speech, 'def' for definition. Validated in case
 // below.
-		@$query = $_GET['query'] or die("You must specify a query type ('pos','def', 'syn' or 'hyper').");
-////////////////////////////////////////////////////////////////////////////////////
-
+		@$query = $_GET['query']
+		or die("ERROR: You must specify a query type. Append &query=QUERY TYPE ('pos','def', 'syn' or 'hyper') to the end of the URL.");
+/***********************************************************************************/
 // Language code for search, default english (en)
 	if (isset($_GET['lang'])) {
-		$langcode = $_GET['lang'];
+		$langCode = $_GET['lang'];
 	}
 	else {
-		$langcode = "en";
+		$langCode = "en";
 	}
-////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Number of results; default '100'
 	if (isset($_GET['count'])) {
 		$count = $_GET['count'];
@@ -43,75 +45,94 @@
 	else {
 		$count = 100;
 	}
-////////////////////////////////////////////////////////////////////////////////////
+/***********************************************************************************/
 // Set wikisource to local if not set. Values either 'local' or 'api'.	
 	if (isset($_GET['source'])) {
 		if ($_GET['source'] == 'api' || $_GET['source'] == 'local') {
-			$wikisource = $_GET['source'];
+			$wikiSource = $_GET['source'];
 		}
 		else {
-			$wikisource = 'api';
+			$wikiSource = 'api';
 		}
 	}
 	else {
-		$wikisource = 'api';
+		$wikiSource = 'api';
 	}
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-// Include wikiextract class and create new object with 3 variables. Returns the
-// contents of the wiktionary entry.
-////////////////////////////////////////////////////////////////////////////////////
-	include 'classes/class.wikiextract.php';
-	$WikiExtract = new WikiExtract($word, $wikisource, $langcode);
-	$wikitext = $WikiExtract->getWikiText();
-////////////////////////////////////////////////////////////////////////////////////
+
+/***********************************************************************************/
 	switch ($query) {
-	////////////////////////////////////////////////////////////////////////////////////
+	/***********************************************************************************/
 	// Include defparse class and create new object with 3 variables.
-	////////////////////////////////////////////////////////////////////////////////////
+	/***********************************************************************************/
 		case "def":
 			include 'classes/class.defparse.php';
-			$DefParse = new DefParse($wikitext, $langcode, $count);
-			$defarray = $DefParse->getDef();
+			$DefParse = new DefParse($langCode);
+			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$defArray = $DefParse->getDef($wikitext, $count);
 			
-			printResults($defarray);
+			printResults($defArray);
 			break;
-	////////////////////////////////////////////////////////////////////////////////////
-	// Include posparse class and create new object with 4 variables.
-	////////////////////////////////////////////////////////////////////////////////////
+	/***********************************************************************************/
+	// Include posparse class and create new object with 3 variables.
+	/***********************************************************************************/
 		case "pos":
 			include 'classes/class.posparse.php';
-			$posparse = new PosParse($wikitext, $langcode, $count);
-			$posarray = $posparse->getPosResults();
+			$posparse = new PosParse($langCode);
+			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$posArray = $posparse->get_pos($wikitext, $count);
 			
-			printResults($posarray);
+			printResults($posArray);
 			break;
-	////////////////////////////////////////////////////////////////////////////////////
+	/***********************************************************************************/
 	// Include synparse class and create new object with 3 variables.
-	////////////////////////////////////////////////////////////////////////////////////		
+	/***********************************************************************************/		
 		case "syn":
 			include 'classes/class.synparse.php';
-			$SynParse = new SynParse($wikitext, $langcode, $count);
-			$synarray = $SynParse->getSyn();
+			$SynParse = new SynParse($langCode);
+			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$synArray = $SynParse->get_syn($wikitext, $count);
 
-			printResults($synarray);
+			printResults($synArray);
 			break;
-	////////////////////////////////////////////////////////////////////////////////////
+	/***********************************************************************************/
 	// Include hyperparse class and create new object with 3 variables. (Hypernyms)
-	////////////////////////////////////////////////////////////////////////////////////	
+	/***********************************************************************************/	
 		case "hyper":
 			include 'classes/class.hyperparse.php';
-			$HyperParse = new HyperParse($wikitext, $langcode, $count);
-			$hyperarray = $HyperParse->getHyper();
+			$HyperParse = new HyperParse($langCode);
+			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$hyperArray = $HyperParse->get_hyper($wikitext, $count);
 
-			printResults($hyperarray);
+			printResults($hyperArray);
 			break;
-			
+	/***********************************************************************************/
+	// Include genderparse class and create new object with 3 variables. (Gender)
+	/***********************************************************************************/	
+		case "gender":
+			include 'classes/class.genderparse.php';
+			$GenderParse = new GenderParse($langCode);
+			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$genderArray = $GenderParse->get_gender($wikitext, $count);
+
+			printResults($genderArray);
+			break;		
+	/***********************************************************************************/	
 		default:
-			echo "You must specify a valid query type ('pos', 'def' or 'syn').";
+			echo "You must specify a valid query type ('pos', 'def', 'syn', 'hyper', or 'gender').";
 			break;
-	}		
-////////////////////////////////////////////////////////////////////////////////////
+	}
+/***********************************************************************************/
+// Include wikiextract class and create new object with 2 variables. Returns the
+// contents of the wiktionary entry for a given word.
+/***********************************************************************************/
+	function get_wiki_text($langCode, $wikiSource, $word) {
+		include 'classes/class.wikiextract.php';
+		$WikiExtract = new WikiExtract($langCode, $wikiSource);
+		return $WikiExtract->get_wikitext($word);	
+	}
+/***********************************************************************************/
+// Prints contents of array.
+/***********************************************************************************/
 	function printResults($array) {
 		$resultseparator = " | ";
 		$printresults = null;
