@@ -13,20 +13,23 @@ class WikiExtract {
 /***********************************************************************************/
 	private $wikiSource; // api or local
 	private $langCode; // 2-letter language code
+	private $langHeader; // language header from config file
+	private $langSeparator; // language separator string from config file
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode, $wikiSource) {
-		$this->langCode = $langCode;
+	public function __construct($langParameters, $wikiSource) {
 		$this->wikiSource = $wikiSource;
-		include './language.config.php';
+		$this->langCode = $langParameters['langCode'];
+		$this->langHeader = $langParameters['langHeader'];
+		$this->langSeparator = $langParameters['langSeparator'];
 	}
 	
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_wikitext ($word) {
+	public function get_wikitext($word) {
 		if ($this->wikiSource == 'local') {
 			$wikitext = $this->sql_fetch_data($word);
 		}
