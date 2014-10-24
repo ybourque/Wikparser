@@ -1,6 +1,6 @@
 <?php
 /***********************************************************************************/
-// Wikitionary Text Parser 0.3
+// Wikitionary Text Parser 0.3a
 // Author: Yves Bourque
 // Go to http://www.igrec.ca/projects/ for full instructions.
 /***********************************************************************************/
@@ -24,7 +24,8 @@
 // query type; 'pos' for part of speech, 'def' for definition. Validated in case
 // below.
 		@$query = $_GET['query']
-		or die("ERROR: You must specify a query type. Append &query=QUERY TYPE ('pos','def', 'syn' or 'hyper') to the end of the URL.");
+		or die("ERROR: You must specify a query type. Append &query=QUERY TYPE 
+		('pos','def', 'syn' or 'hyper') to the end of the URL.");
 /***********************************************************************************/
 // Language code for search, default english (en)
 	if (isset($_GET['lang'])) {
@@ -58,16 +59,19 @@
 	else {
 		$wikiSource = 'api';
 	}
-
 /***********************************************************************************/
+// Create $langParameters variable using the values defined in config file.
+	include './language.config.php';
+/***********************************************************************************/
+
 	switch ($query) {
 	/***********************************************************************************/
 	// Include defparse class and create new object with 3 variables.
 	/***********************************************************************************/
 		case "def":
 			include 'classes/class.defparse.php';
-			$DefParse = new DefParse($langCode);
-			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$DefParse = new DefParse($langParameters);
+			$wikitext = get_wiki_text($langParameters, $wikiSource, $word);
 			$defArray = $DefParse->getDef($wikitext, $count);
 			
 			printResults($defArray);
@@ -77,8 +81,8 @@
 	/***********************************************************************************/
 		case "pos":
 			include 'classes/class.posparse.php';
-			$posparse = new PosParse($langCode);
-			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$posparse = new PosParse($langParameters);
+			$wikitext = get_wiki_text($langParameters, $wikiSource, $word);
 			$posArray = $posparse->get_pos($wikitext, $count);
 			
 			printResults($posArray);
@@ -88,8 +92,8 @@
 	/***********************************************************************************/		
 		case "syn":
 			include 'classes/class.synparse.php';
-			$SynParse = new SynParse($langCode);
-			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$SynParse = new SynParse($langParameters);
+			$wikitext = get_wiki_text($langParameters, $wikiSource, $word);
 			$synArray = $SynParse->get_syn($wikitext, $count);
 
 			printResults($synArray);
@@ -99,8 +103,8 @@
 	/***********************************************************************************/	
 		case "hyper":
 			include 'classes/class.hyperparse.php';
-			$HyperParse = new HyperParse($langCode);
-			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$HyperParse = new HyperParse($langParameters);
+			$wikitext = get_wiki_text($langParameters, $wikiSource, $word);
 			$hyperArray = $HyperParse->get_hyper($wikitext, $count);
 
 			printResults($hyperArray);
@@ -110,8 +114,8 @@
 	/***********************************************************************************/	
 		case "gender":
 			include 'classes/class.genderparse.php';
-			$GenderParse = new GenderParse($langCode);
-			$wikitext = get_wiki_text($langCode, $wikiSource, $word);
+			$GenderParse = new GenderParse($langParameters);
+			$wikitext = get_wiki_text($langParameters, $wikiSource, $word);
 			$genderArray = $GenderParse->get_gender($wikitext, $count);
 
 			printResults($genderArray);
@@ -125,9 +129,9 @@
 // Include wikiextract class and create new object with 2 variables. Returns the
 // contents of the wiktionary entry for a given word.
 /***********************************************************************************/
-	function get_wiki_text($langCode, $wikiSource, $word) {
+	function get_wiki_text($langParameters, $wikiSource, $word) {
 		include 'classes/class.wikiextract.php';
-		$WikiExtract = new WikiExtract($langCode, $wikiSource);
+		$WikiExtract = new WikiExtract($langParameters, $wikiSource);
 		return $WikiExtract->get_wikitext($word);	
 	}
 /***********************************************************************************/
