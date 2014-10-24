@@ -10,16 +10,18 @@ class GenderParse {
 // Variables
 /***********************************************************************************/
 	private $langCode;			// language code (e.g. en, fr, da, etc.)
+	private $genderPattern;		// Gender regex pattern, set in config file
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode) {
-		$this->langCode = $langCode;
-	// Set language variables.	
-		include './language.config.php';
-		if (empty($this->genderPattern)) {
+	public function __construct($langParameters) {
+		if (empty($langParameters['genderPattern'])) {
 			die("ERROR: Gender parameters are not set for this language in language.config.php.");
+		}
+		else {
+			$this->langCode = $langParameters['langCode'];
+			$this->genderPattern = $langParameters['genderPattern'];
 		}
 	}
 /***********************************************************************************/

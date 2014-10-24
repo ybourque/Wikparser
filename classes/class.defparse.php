@@ -8,17 +8,21 @@ class DefParse {
 /***********************************************************************************/
 // Variables
 /***********************************************************************************/
-	private $langCode;	// language code (e.g. en, fr, da, etc.)
+	private $langCode;		// language code (e.g. en, fr, da, etc.)
+	private $defHeader; 	// definitions header, set in config file
+	private $defTag;		// definitions tag, set in config file
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode) {
-		$this->langCode = $langCode;
-	// Set language variables.	
-		include './language.config.php';
-		if (empty($this->defHeader) && empty($this->defTag)) {
+	public function __construct($langParameters) {
+		if (empty($langParameters['defHeader']) && empty($langParameters['defTag'])) {
 			die("ERROR: Definition parameters are not set for this language in language.config.php.");
+		}
+		else {
+			$this->langCode = $langParameters['langCode'];
+			$this->defHeader = $langParameters['defHeader'];
+			$this->defTag = $langParameters['defTag'];
 		}
 	}
 /***********************************************************************************/

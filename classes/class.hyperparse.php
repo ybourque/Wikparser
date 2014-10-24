@@ -9,17 +9,19 @@ class HyperParse {
 /***********************************************************************************/
 // Variables
 /***********************************************************************************/
-private $langCode;	// language code (e.g. en, fr, da, etc.)
+	private $langCode;			// language code (e.g. en, fr, da, etc.)
+	private $hyperHeader;		// Hypernyms header, set in config file
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode) {
-		$this->langCode = $langCode;
-	// Set language variables.	
-		include './language.config.php';
-		if (empty($this->hyperHeader)) {
+	public function __construct($langParameters) {
+		if (empty($langParameters['hyperHeader'])) {
 			die("ERROR: Hypernym parameter is not set for this language in language.config.php.");
+		}
+		else {
+			$this->langCode = $langParameters['langCode'];
+			$this->hyperHeader = $langParameters['hyperHeader'];
 		}
 	}
 /***********************************************************************************/

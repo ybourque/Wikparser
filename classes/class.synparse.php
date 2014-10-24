@@ -9,17 +9,19 @@ class SynParse {
 /***********************************************************************************/
 // Variables
 /***********************************************************************************/
-	private $langCode;	// language code (e.g. en, fr, da, etc.)
+	private $langCode;		// language code (e.g. en, fr, da, etc.)
+	private $synHeader; 	// Synonyms header, set in config file
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode) {
-		$this->langCode = $langCode;
-	// Set language variables.	
-		include './language.config.php';
-		if (empty($this->synHeader)) {
+	public function __construct($langParameters) {
+		if (empty($langParameters['synHeader'])) {
 			die("ERROR: Synonym parameter is not set for this language in language.config.php.");
+		}
+		else {
+			$this->langCode = $langParameters['langCode'];
+			$this->synHeader = $langParameters['synHeader'];
 		}
 	}
 /***********************************************************************************/
@@ -35,7 +37,7 @@ class SynParse {
 // Extracts synonyms from wikitext
 /***********************************************************************************/
 	private function extract_syn($wikitext, $count) {
-		$synString = null;	
+		$synString = null;
 		$synPattern = "/$this->synHeader.*?\n\n/us";
 		$itemPattern = "/\[\[.*?\]\]/u";
 	

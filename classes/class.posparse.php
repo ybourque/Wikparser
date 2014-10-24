@@ -10,16 +10,26 @@ class PosParse {
 // Variables
 /***********************************************************************************/
 	private $langCode;			// language code (e.g. en, fr, da, etc.)
+	private $posMatchType;		// POS Match Type, set in config file	
+	private $posArray;			// POS Array, set in config file	
+	private $posPattern;		// POS regex pattern, set in config file	
+	private $posExtraString;	// POS extra string, set in config file	
 	
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langCode) {
-		$this->langCode = $langCode;
-	// Set language variables.	
-		include './language.config.php';
-		if (empty($this->posMatchType) || (empty($this->posPattern) && empty($this->posArray))) {
+	public function __construct($langParameters) {
+		if 
+		(empty($langParameters['posMatchType']) || 
+		(empty($langParameters['posPattern']) && empty($langParameters['posArray']))) {
 			die("ERROR: POS parameters are not set correctly for this language in language.config.php.");
+		}
+		else {
+			$this->langCode = $langParameters['langCode'];
+			$this->posMatchType = $langParameters['posMatchType'];
+			$this->posArray = $langParameters['posArray'];
+			$this->posPattern = $langParameters['posPattern'];
+			$this->posExtraString = $langParameters['posExtraString'];
 		}
 	}
 /***********************************************************************************/
