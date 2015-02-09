@@ -40,7 +40,6 @@ class DefParse {
 /***********************************************************************************/
 	private function extract_def($wikitext, $count) {
 		$defArray = array();
-
 		if (!empty($this->defHeader)) {
 			$sectionPattern = "(".preg_quote($this->defHeader).".*?\n\n)s";
 		// Find all matches for header + text until double newline.	
@@ -84,6 +83,8 @@ class DefParse {
 		$strippedArray = str_replace("]]", "", $strippedArray);
 	// Remove definition identifier
 		$strippedArray = str_replace($this->defTag, "", $strippedArray);
+	// Remove trailing Wiktionary API XML tags
+		$strippedArray = preg_replace('(\<\/\w*\>)', "", $defArray);
 		
 		return $strippedArray;
 	}
