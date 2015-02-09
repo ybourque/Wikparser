@@ -26,10 +26,7 @@ class StripTags {
 			$string = trim($string);
 		
 		// Trims language code from end of string if preceded by | (e.g. Spanish gender)
-			$strippedString = preg_replace("/\|$langCode$/", "", $string);
-		// Remove trailing Wiktionary API XML tags (when closing tags occur immediately
-		// after requested info)
-			$finalArray[] = preg_replace('(\<\/\w*\>)', "", $strippedString);
+			$finalArray[] = preg_replace("/\|$langCode$/", "", $string);
 		}
 		return $finalArray;
 	}

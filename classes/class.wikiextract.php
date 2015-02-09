@@ -66,6 +66,9 @@ class WikiExtract {
 			die("ERROR: The Wiktionary API did not return a page for that word.");
 		}
 		else {
+			// Strip Wiktionary XML tags
+			$wikiAPIResult = preg_replace('(\<\?xml.*\<wikitext xml\:space\=\"preserve\"\>)s', "", $wikiAPIResult);
+			$wikiAPIResult = preg_replace('(\<\/wikitext\>\<\/parse\>\<\/api\>)s', "", $wikiAPIResult);
 			return $wikiAPIResult;
 		}
 	}		
