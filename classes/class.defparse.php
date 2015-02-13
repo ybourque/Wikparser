@@ -73,17 +73,34 @@ class DefParse {
 // Strips tags used for additional info and links to other words.
 /***********************************************************************************/
 	private function strip_tags($defArray) {
-	// Strip anything enclosed between {{ }}
-		$strippedArray = preg_replace('(\{\{.*?\}\})', "", $defArray);
-	// Remove 1st half of [[word|Word]] strings.
-		$strippedArray = preg_replace('(\[\[[^\]]*?\|)u', "", $strippedArray);
-	// Remove brackets [[
-		$strippedArray = str_replace("[[", "", $strippedArray);
-	// Remove brackets ]]
-		$strippedArray = str_replace("]]", "", $strippedArray);
-	// Remove definition identifier
-		$strippedArray = str_replace($this->defTag, "", $strippedArray);
-		
+	
+		foreach ($defArray as $def){
+		// Strip anything enclosed between {{ }}
+			$strippedDef = preg_replace('(\{\{.*?\}\})', "", $def);
+		// Remove 1st half of [[word|Word]] strings.	
+			$strippedDef = preg_replace('(\[\[[^\]]*?\|)u', "", $strippedDef);
+		// Remove brackets [[
+			$strippedDef = str_replace("[[", "", $strippedDef);
+		// Remove brackets ]]
+			$strippedDef = str_replace("]]", "", $strippedDef);
+		// Remove triple single quotes.
+			$strippedDef = str_replace("'''", "", $strippedDef);
+		// Remove double single quotes.
+			$strippedDef = str_replace("''", "", $strippedDef);
+		// Remove definition identifier	
+			$strippedDef = str_replace($this->defTag, "", $strippedDef);
+			
+		// Some Wiktionary definitions are enclosed in brackets, thus resulting in an empty
+		// values when trying to remove them (see EN 'cats'). If the definition is empty,
+		// add the original, unmodified definition to the final array; else, add the
+		// stripped definition.		
+			if (trim($strippedDef) != "") {
+				$strippedArray[] = $strippedDef;
+			}
+			else {
+				$strippedArray[] = $def;
+			}
+		}
 		return $strippedArray;
 	}
 /***********************************************************************************/
