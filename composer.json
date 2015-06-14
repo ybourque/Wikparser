@@ -1,0 +1,21 @@
+{
+    "name": "quuuit/wikparser",
+    "description": "Wiktionary Text Parser",
+    "keywords": ["wiktionary", "yii", "parser"],
+    "type": "yii-extension",
+    "homepage": "https://github.com/quuuit/Wikparser",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Plamadeala Ian ",
+            "email": "plamadealaian@gmail.com",
+            "homepage" :"https://github.com/quuuit"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-4": {"quuuit\\Wikparser\\": ""}
+    }
+}
