@@ -55,7 +55,7 @@ class WikiExtract {
 	// Paramaters passed to the Wik API, including search word.	
 		$params = '?action=parse&prop=wikitext&page='.$word.'&format=xml';
 		
-		$ch = curl_init('http://'.$this->langCode.'.wiktionary.org/w/api.php'.$params);
+		$ch = curl_init('https://'.$this->langCode.'.wiktionary.org/w/api.php'.$params);
 		curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch,CURLOPT_ENCODING , "gzip");
