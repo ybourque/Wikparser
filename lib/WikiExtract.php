@@ -109,7 +109,7 @@ class WikiExtract {
 			$languages = explode($this->langSeparator, $wikitext);
 		
 			foreach ($languages as $value) {
-				if (strpos($value, $this->langHeader) !== false) {
+				if (preg_match('/'.$this->langHeader.'/', $value) > 0) {
 					$wikitext = $value;
 					$bln = true;
 				}

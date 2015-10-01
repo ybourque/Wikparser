@@ -5,6 +5,44 @@ use quuuit\Wikparser\lib\WikiExtract;
 
 class WikParser{
     public $parsedDefinition='';
+
+    /** @var string */
+    protected $langHeader;
+
+    /**
+     * Set the language header.
+     * This is the header (usually a second-level header, i.e. H2 in HTML) under
+     * the words that are to be queried.
+     * For example, English is '==\w*English\w*=='.
+     * @param string $langHeader
+     */
+    public function setLangHeader($langHeader) {
+        $this->langHeader = $langHeader;
+    }
+
+    /**
+     * Get the language header regex used for $langCode language.
+     * For example, for 'en' (English) this is '==\s*English\s*=='.
+     * @param string $langCode The Wiktionary langage code (usually the same as ISO-639).
+     * @return string The regular expression used to determine the langage header.
+     */
+    public function getLangHeader($langCode = null) {
+        if ($this->langHeader) {
+            return $this->langHeader;
+        }
+        switch ($langCode) {
+            case 'fr':
+                return 'fr}}\s*==';
+            case 'es':
+                return '{{ES';
+            case 'de':
+                return 'Deutsch}})\s*==';
+            case 'en':
+            default:
+                return '==\s*English\s*==';
+        }
+    }
+
     public function getWordDefiniton($word,$query='def',$langCode='en',$count=100,$source='api'){
         $this->word = $word;
         $this->count = $count;
@@ -14,7 +52,6 @@ class WikParser{
             case "en":
                 $this->langParameters = array(
                     "langCode" => "en",
-                    "langHeader" => "==English==",
                     "langSeparator" => "----",
                     "defHeader" => "",
                     "defTag" => "# ",
@@ -34,7 +71,6 @@ class WikParser{
             case "fr":
                 $this->langParameters = array(
                     "langCode" => "fr",
-                    "langHeader" => "fr}} ==",
                     "langSeparator" => "== {{=",
                     "defHeader" => "",
                     "defTag" => "# ",
@@ -51,7 +87,6 @@ class WikParser{
             case "es":
                 $this->langParameters = array(
                     "langCode" => "es",
-                    "langHeader" => "{{ES",
                     "langSeparator" => "",
                     "defHeader" => "",
                     "defTag" => ";",
@@ -68,7 +103,6 @@ class WikParser{
             case "de":
                 $this->langParameters = array(
                     "langCode" => "de",
-                    "langHeader" => "Deutsch}}) ==",
                     "langSeparator" => "({{Sprache|",
                     "defHeader" => "{{Bedeutungen}}",
                     "defTag" => ":",
@@ -85,7 +119,6 @@ class WikParser{
             case "":
                 $this->langParameters = array(
                     "langCode" => "",		// string
-                    "langHeader" => "",		// string
                     "langSeparator" => "",	// string
                     "defHeader" => "",		// string
                     "defTag" => "",			// string
@@ -102,7 +135,6 @@ class WikParser{
             default:
                 $this->langParameters = array(
                     "langCode" => "en",
-                    "langHeader" => "==English==",
                     "langSeparator" => "----",
                     "defHeader" => "",
                     "defTag" => "# ",
@@ -119,6 +151,7 @@ class WikParser{
                 );
                 break;
         }
+        $this->langParameters['langHeader'] = $this->getLangHeader();
         return $this->parseQuery($query);
     }
     /***********************************************************************************/
