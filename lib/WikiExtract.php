@@ -1,4 +1,5 @@
 <?php
+namespace quuuit\Wikparser\lib;
 /***********************************************************************************/
 // Gets all raw text for a given word via either Wiktionary's API or a local MySQL
 // copy (defined in conc.php). Accepts 3 variables:
@@ -66,9 +67,6 @@ class WikiExtract {
 			die("ERROR: The Wiktionary API did not return a page for that word.");
 		}
 		else {
-			// Strip Wiktionary XML tags
-			$wikiAPIResult = preg_replace('(\<\?xml.*\<wikitext xml\:space\=\"preserve\"\>)s', "", $wikiAPIResult);
-			$wikiAPIResult = preg_replace('(\<\/wikitext\>\<\/parse\>\<\/api\>)s', "", $wikiAPIResult);
 			return $wikiAPIResult;
 		}
 	}		
@@ -111,7 +109,7 @@ class WikiExtract {
 			$languages = explode($this->langSeparator, $wikitext);
 		
 			foreach ($languages as $value) {
-				if (strpos($value, $this->langHeader) !== false) {
+				if (preg_match('/'.$this->langHeader.'/', $value) > 0) {
 					$wikitext = $value;
 					$bln = true;
 				}
