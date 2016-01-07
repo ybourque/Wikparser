@@ -1,7 +1,11 @@
 <?php
-namespace quuuit\Wikparser;
-use quuuit\Wikparser\lib\DefParse;
-use quuuit\Wikparser\lib\WikiExtract;
+namespace ybourque\Wikparser;
+use ybourque\Wikparser\lib\DefParse;
+use ybourque\Wikparser\lib\GenderParse;
+use ybourque\Wikparser\lib\HyperParse;
+use ybourque\Wikparser\lib\PosParse;
+use ybourque\Wikparser\lib\SynParse;
+use ybourque\Wikparser\lib\WikiExtract;
 
 class WikParser{
     public $parsedDefinition='';
@@ -151,7 +155,7 @@ class WikParser{
                 );
                 break;
         }
-        $this->langParameters['langHeader'] = $this->getLangHeader();
+        $this->langParameters['langHeader'] = $this->getLangHeader($langCode);
         return $this->parseQuery($query);
     }
     /***********************************************************************************/
@@ -160,7 +164,7 @@ class WikParser{
     /***********************************************************************************/
 // Number of results; default '100'
     /***********************************************************************************/
-// Set wikisource to local if not set. Values either 'local' or 'api'.	
+// Set wikisource to local if not set. Values either 'local' or 'api'.
     /***********************************************************************************/
     /***********************************************************************************/
     public function parseQuery($query){
@@ -169,7 +173,6 @@ class WikParser{
             // Include defparse class and create new object with 3 variables.
             /***********************************************************************************/
             case "def":
-
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $DefParse = new DefParse($this->langParameters);
                     $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
@@ -182,7 +185,6 @@ class WikParser{
             // Include posparse class and create new object with 3 variables.
             /***********************************************************************************/
             case "pos":
-                include 'lib/class.posparse.php';
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $posparse = new PosParse($this->langParameters);
                     $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
@@ -195,7 +197,6 @@ class WikParser{
             // Include synparse class and create new object with 3 variables.
             /***********************************************************************************/
             case "syn":
-                include 'lib/class.synparse.php';
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $SynParse = new SynParse($this->langParameters);
                     $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
@@ -209,7 +210,6 @@ class WikParser{
             // Include hyperparse class and create new object with 3 variables. (Hypernyms)
             /***********************************************************************************/
             case "hyper":
-                include 'lib/class.hyperparse.php';
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $HyperParse = new HyperParse($this->langParameters);
                     $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
@@ -222,7 +222,6 @@ class WikParser{
             // Include genderparse class and create new object with 3 variables. (Gender)
             /***********************************************************************************/
             case "gender":
-                include 'lib/class.genderparse.php';
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $GenderParse = new GenderParse($this->langParameters);
                     $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
@@ -264,4 +263,4 @@ class WikParser{
         echo rtrim($printresults, $resultseparator);
     }
 }
-?>	
+?>
