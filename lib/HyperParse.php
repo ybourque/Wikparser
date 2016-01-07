@@ -29,16 +29,16 @@ class HyperParse {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_hyper($wikitext, $count) {
-		$hyperArray = $this->extract_hyper($wikitext, $count);
-		return $this->strip_tags($hyperArray);
+	public function getHyper($wikitext, $count) {
+		$hyperArray = $this->extractHyper($wikitext, $count);
+		return $this->stripTags($hyperArray);
 	}
 /***********************************************************************************/
 // private methods
 /***********************************************************************************/
 // Extracts hypernyms from wikitext
 /***********************************************************************************/
-	private function extract_hyper($wikitext, $count) {
+	private function extractHyper($wikitext, $count) {
 		$hyperString = null;
 		$hyperPattern = "/$this->hyperHeader.*?\n\n/us";
 		$itemPattern = "/\[\[.*?\]\]/u";
@@ -64,7 +64,7 @@ class HyperParse {
 /***********************************************************************************/
 // Removes unnecessary string elements from results
 /***********************************************************************************/
-	private function strip_tags($hyperArray) {
+	private function stripTags($hyperArray) {
 		$strippedArray = $hyperArray;
 	// Remove first half of entries such as [[...:word]]
 		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);

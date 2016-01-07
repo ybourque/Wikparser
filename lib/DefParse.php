@@ -30,8 +30,8 @@ class DefParse {
 // public methods
 /***********************************************************************************/
 	public function getDef($wikitext, $count) {
-		$defArray = $this->extract_def($wikitext, $count);
-		return $this->strip_tags($defArray);
+		$defArray = $this->extractDef($wikitext, $count);
+		return $this->stripTags($defArray);
 	}
 /***********************************************************************************/
 // private methods
@@ -39,7 +39,7 @@ class DefParse {
 // Extracts all definitions by splitting at new lines and matching for definition
 // tags set in paramaters.
 /***********************************************************************************/
-	private function extract_def($wikitext, $count) {
+	private function extractDef($wikitext, $count) {
 		$defArray = array();
 
 		if (!empty($this->defHeader)) {
@@ -74,7 +74,7 @@ class DefParse {
 /***********************************************************************************/
 // Strips tags used for additional info and links to other words.
 /***********************************************************************************/
-	private function strip_tags($defArray) {
+	private function stripTags($defArray) {
 	// Strip anything enclosed between {{ }}
 		$strippedArray = preg_replace('(\{\{.*?\}\})', "", $defArray);
 	// Remove 1st half of [[word|Word]] strings.

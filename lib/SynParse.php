@@ -29,16 +29,16 @@ class SynParse {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_syn($wikitext, $count) {
-		$synArray = $this->extract_syn($wikitext, $count);
-		return $this->strip_tags($synArray);
+	public function getSyn($wikitext, $count) {
+		$synArray = $this->extractSyn($wikitext, $count);
+		return $this->stripTags($synArray);
 	}
 /***********************************************************************************/
 // private methods
 /***********************************************************************************/
 // Extracts synonyms from wikitext
 /***********************************************************************************/
-	private function extract_syn($wikitext, $count) {
+	private function extractSyn($wikitext, $count) {
 		$synString = null;
 		$synPattern = "/$this->synHeader.*?\n\n/us";
 		$itemPattern = "/\[\[.*?\]\]/u";
@@ -64,7 +64,7 @@ class SynParse {
 /***********************************************************************************/
 // Removes unnecessary string elements from results
 /***********************************************************************************/
-	private function strip_tags($synArray) {
+	private function stripTags($synArray) {
 		$strippedArray = $synArray;
 	// Remove first half of entries such as [[...:word]]
 		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);

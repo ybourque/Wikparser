@@ -30,15 +30,15 @@ class WikiExtract {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_wikitext($word) {
+	public function getWikiText($word) {
 		if ($this->wikiSource == 'local') {
-			$wikitext = $this->sql_fetch_data($word);
+			$wikitext = $this->sqlFetchData($word);
 		}
 		else if ($this->wikiSource == 'api') {
-			$wikitext = $this->get_wikitext_from_wiktionary($word);
+			$wikitext = $this->getWikiTextFromWiktionary($word);
 		}
 
-		return $this->lang_extract($wikitext);
+		return $this->langExtract($wikitext);
 	}
 /***********************************************************************************/
 // private methods
@@ -47,7 +47,7 @@ class WikiExtract {
 /***********************************************************************************/
 // Retrieves raw data via Wiktionary's API.
 /***********************************************************************************/
-	private function get_wikitext_from_wiktionary($word) {
+	private function getWikiTextFromWiktionary($word) {
 		$word = urlencode($word);
 
 	// Must be supplied, otherwise IP will be banned
@@ -73,7 +73,7 @@ class WikiExtract {
 /***********************************************************************************/
 // Retrieves raw data via a local MySQL copy of Wiktionary (defined in conc.php).
 /***********************************************************************************/
-	private function sql_fetch_data($word) {
+	private function sqlFetchData($word) {
 
 		include 'conc.php';
 		$word = mysqli_real_escape_string($conn, $word);
@@ -102,7 +102,7 @@ class WikiExtract {
 // Extracts content for specified language from raw wiktionary data. Some entries
 // contain text for other languages.
 /***********************************************************************************/
-	private function lang_extract($wikitext){
+	private function langExtract($wikitext){
 		$bln = false;
 
 		if ($this->langSeparator !== "") {

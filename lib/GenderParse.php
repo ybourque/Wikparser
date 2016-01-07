@@ -29,20 +29,20 @@ class GenderParse {
 /***********************************************************************************/
 // public methods; used to retrieve contents of variables
 /***********************************************************************************/
-	public function get_gender($wikitext, $count) {
-		$genderArray = $this->extract_gender($wikitext, $count);
+	public function getGender($wikitext, $count) {
+		$genderArray = $this->extractGender($wikitext, $count);
 
 		include "./classes/class.strip.tags.php";
 		$stripTagsObject = new StripTags();
 
-		return $stripTagsObject->strip_tags($genderArray, $this->langCode);
+		return $stripTagsObject->stripTags($genderArray, $this->langCode);
 	}
 /***********************************************************************************/
 // private methods
 /***********************************************************************************/
 // Extracts every occurrence of gender.
 /***********************************************************************************/
-	private function extract_gender($wikitext, $count) {
+	private function extractGender($wikitext, $count) {
 		$tempGenderResults = array();
 
 		if ($this->genderPattern != "") {

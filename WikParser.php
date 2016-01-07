@@ -175,7 +175,7 @@ class WikParser{
             case "def":
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $DefParse = new DefParse($this->langParameters);
-                    $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
+                    $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
                     if(isset($DefParse)){
                         $parsedDefinition = $DefParse->getDef($wikitext, $this->count);
                     }
@@ -187,9 +187,9 @@ class WikParser{
             case "pos":
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $posparse = new PosParse($this->langParameters);
-                    $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
+                    $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
                     if(isset($DefParse)){
-                        $parsedDefinition = $posparse->get_pos($wikitext, $this->count);
+                        $parsedDefinition = $posparse->getPos($wikitext, $this->count);
                     }
                 }
                 break;
@@ -199,9 +199,9 @@ class WikParser{
             case "syn":
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $SynParse = new SynParse($this->langParameters);
-                    $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
+                    $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
                     if(isset($DefParse)){
-                        $parsedDefinition = $SynParse->get_syn($wikitext, $this->count);
+                        $parsedDefinition = $SynParse->getSyn($wikitext, $this->count);
                     }
                 }
                 break;
@@ -212,9 +212,9 @@ class WikParser{
             case "hyper":
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $HyperParse = new HyperParse($this->langParameters);
-                    $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
+                    $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
                     if(isset($DefParse)){
-                        $parsedDefinition = $HyperParse->get_hyper($wikitext, $this->count);
+                        $parsedDefinition = $HyperParse->getHyper($wikitext, $this->count);
                     }
                 }
                 break;
@@ -224,9 +224,9 @@ class WikParser{
             case "gender":
                 if(isset($this->langParameters) and isset($this->word) and isset($this->source) and isset($this->count)){
                     $GenderParse = new GenderParse($this->langParameters);
-                    $wikitext = $this->get_wiki_text($this->langParameters, $this->source, $this->word);
+                    $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
                     if(isset($DefParse)){
-                        $parsedDefinition = $GenderParse->get_gender($wikitext, $this->count);
+                        $parsedDefinition = $GenderParse->getGender($wikitext, $this->count);
                     }
                 }
                 break;
@@ -246,9 +246,9 @@ class WikParser{
 // Include wikiextract class and create new object with 2 variables. Returns the
 // contents of the wiktionary entry for a given word.
     /***********************************************************************************/
-    public function get_wiki_text($langParameters, $wikiSource, $word) {
+    public function getWikiText($langParameters, $wikiSource, $word) {
         $WikiExtract = new WikiExtract($langParameters, $wikiSource);
-        return $WikiExtract->get_wikitext($word);
+        return $WikiExtract->getWikiText($word);
     }
 
     /***********************************************************************************/

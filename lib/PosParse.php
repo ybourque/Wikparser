@@ -37,13 +37,13 @@ class PosParse {
 /***********************************************************************************/
 // public methods; used to retrieve contents of variables
 /***********************************************************************************/
-	public function get_pos($wikitext, $count) {
-		$posArray = $this->extract_pos($wikitext, $count);
+	public function getPos($wikitext, $count) {
+		$posArray = $this->extractPos($wikitext, $count);
 
 		include "./classes/class.strip.tags.php";
 		$stripTagsObject = new StripTags();
 
-		$posArray = $stripTagsObject->strip_tags($posArray, $this->langCode);
+		$posArray = $stripTagsObject->stripTags($posArray, $this->langCode);
 		return array_unique($posArray);
 	}
 /***********************************************************************************/
@@ -53,7 +53,7 @@ class PosParse {
 /***********************************************************************************/
 // Extracts every occurrence of a part of speech.
 /***********************************************************************************/
-	private function extract_pos($wikitext, $count) {
+	private function extractPos($wikitext, $count) {
 		$tempPosResults = array();
 
 	// If the matches are in an array

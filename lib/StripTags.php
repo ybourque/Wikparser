@@ -19,7 +19,7 @@ class StripTags {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function strip_tags($array, $langCode) {
+	public function stripTags($array, $langCode) {
 		$tags_array = array("[", "]", "{", "}", "=");
 		foreach ($tags_array as $tag) {
 			$array = str_replace($tag, "", $array);
