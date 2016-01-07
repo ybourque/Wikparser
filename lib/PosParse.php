@@ -39,10 +39,7 @@ class PosParse {
 /***********************************************************************************/
 	public function getPos($wikitext, $count) {
 		$posArray = $this->extractPos($wikitext, $count);
-
-		include "./classes/class.strip.tags.php";
 		$stripTagsObject = new StripTags();
-
 		$posArray = $stripTagsObject->stripTags($posArray, $this->langCode);
 		return array_unique($posArray);
 	}

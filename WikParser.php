@@ -51,113 +51,16 @@ class WikParser{
         $this->word = $word;
         $this->count = $count;
         $this->source = $source;
-        switch ($langCode) {
-            // English parameters
-            case "en":
-                $this->langParameters = array(
-                    "langCode" => "en",
-                    "langSeparator" => "----",
-                    "defHeader" => "",
-                    "defTag" => "# ",
-                    "synHeader" => "====Synonyms====",
-                    "hyperHeader" => "====Hypernyms====",
-                    "genderPattern" => "",
-                    "posMatchType" => "array",
-                    "posPattern" => "",
-                    "posArray" => array(
-                        '===Noun===', '===Verb===', '===Adjective===', '===Adverb===', '===Preposition===',
-                        '===Particle===', '===Pronouns===', '===Interjection===', '===Conjunction===',
-                        '===Article==='),
-                    "posExtraString" => "=",
-                );
-                break;
-            // French parameters
-            case "fr":
-                $this->langParameters = array(
-                    "langCode" => "fr",
-                    "langSeparator" => "== {{=",
-                    "defHeader" => "",
-                    "defTag" => "# ",
-                    "synHeader" => "==== {{S|synonymes}} ====",
-                    "hyperHeader" => "==== {{S|hyperonymes}} ====",
-                    "genderPattern" => "(\{\{([mf]|mf)\??\}\})",
-                    "posMatchType" => "preg",
-                    "posPattern" => "(\{\{\S\|[\d\w\s]+\|fr(\|num=[0-9])?\}\})u",
-                    "posArray" => array(),
-                    "posExtraString" => "{{S|",
-                );
-                break;
-            // Spanish parameters
-            case "es":
-                $this->langParameters = array(
-                    "langCode" => "es",
-                    "langSeparator" => "",
-                    "defHeader" => "",
-                    "defTag" => ";",
-                    "synHeader" => "'''Sinónimo",
-                    "hyperHeader" => "",
-                    "genderPattern" => "(\s?(masculino|femenino)(\|es)?\}\}\s?===)",
-                    "posMatchType" => "preg",
-                    "posPattern" => "(===\s?\{\{\w*[\|\s])u",
-                    "posArray" => array(),
-                    "posExtraString" => "",
-                );
-                break;
-            // German parameters
-            case "de":
-                $this->langParameters = array(
-                    "langCode" => "de",
-                    "langSeparator" => "({{Sprache|",
-                    "defHeader" => "{{Bedeutungen}}",
-                    "defTag" => ":",
-                    "synHeader" => "{{Synonyme}}",
-                    "hyperHeader" => "{{Oberbegriffe}}",
-                    "genderPattern" => "(\{\{[mfn]\}\}\s===)",
-                    "posMatchType" => "preg",
-                    "posPattern" => "(\{\{Wortart\|\w+\|)",
-                    "posArray" => array(),
-                    "posExtraString" => "{{Wortart|",
-                );
-                break;
-            // Fill in the following settings for a language of your choice.
-            case "":
-                $this->langParameters = array(
-                    "langCode" => "",		// string
-                    "langSeparator" => "",	// string
-                    "defHeader" => "",		// string
-                    "defTag" => "",			// string
-                    "synHeader" => "",		// string
-                    "hyperHeader" => "",	// string
-                    "genderPattern" => "",	// regex
-                    "posMatchType" => "",	// 'preg' or 'array'
-                    "posPattern" => "",		// regex
-                    "posArray" => "",		// array
-                    "posExtraString" => "",	// string
-                );
-                break;
-            // Default parameters (currently english)
-            default:
-                $this->langParameters = array(
-                    "langCode" => "en",
-                    "langSeparator" => "----",
-                    "defHeader" => "",
-                    "defTag" => "# ",
-                    "synHeader" => "====Synonyms====",
-                    "hyperHeader" => "====Hypernyms====",
-                    "genderPattern" => "",
-                    "posMatchType" => "array",
-                    "posPattern" => "",
-                    "posArray" => array(
-                        '===Noun===', '===Verb===', '===Adjective===', '===Adverb===', '===Preposition===',
-                        '===Particle===', '===Pronouns===', '===Interjection===', '===Conjunction===',
-                        '===Article==='),
-                    "posExtraString" => "=",
-                );
-                break;
-        }
-        $this->langParameters['langHeader'] = $this->getLangHeader($langCode);
+        $this->langParameters = $this->newLang($langCode);
         return $this->parseQuery($query);
     }
+
+    private function newLang($langCode)
+    {
+        $class = 'ybourque\Wikparser\lib\Lang\\' . ucfirst(strtolower($langCode));
+        return new $class();
+    }
+
     /***********************************************************************************/
     /***********************************************************************************/
 // Language code for search, default english (en)

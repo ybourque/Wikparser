@@ -31,10 +31,7 @@ class GenderParse {
 /***********************************************************************************/
 	public function getGender($wikitext, $count) {
 		$genderArray = $this->extractGender($wikitext, $count);
-
-		include "./classes/class.strip.tags.php";
 		$stripTagsObject = new StripTags();
-
 		return $stripTagsObject->stripTags($genderArray, $this->langCode);
 	}
 /***********************************************************************************/
