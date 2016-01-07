@@ -1,4 +1,6 @@
 <?php
+namespace ybourque\Wikparser\lib;
+
 /***********************************************************************************/
 // This class strips common tags from Wiktionary's raw data.
 // Accepts an array.
@@ -8,7 +10,7 @@ class StripTags {
 /***********************************************************************************/
 // Variables
 /***********************************************************************************/
-	
+
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
@@ -24,7 +26,7 @@ class StripTags {
 		}
 		foreach ($array as $string) {
 			$string = trim($string);
-		
+
 		// Trims language code from end of string if preceded by | (e.g. Spanish gender)
 			$finalArray[] = preg_replace("/\|$langCode$/", "", $string);
 		}

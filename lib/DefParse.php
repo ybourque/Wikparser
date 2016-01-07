@@ -1,5 +1,5 @@
 <?php
-namespace quuuit\Wikparser\lib;
+namespace ybourque\Wikparser\lib;
 /***********************************************************************************/
 // This class is used to extract all definitions for a word.
 // See the language.config.php file for setting language specific parameters.
@@ -12,7 +12,7 @@ class DefParse {
 	private $langCode;		// language code (e.g. en, fr, da, etc.)
 	private $defHeader; 	// definitions header, set in config file
 	private $defTag;		// definitions tag, set in config file
-	
+
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
@@ -44,12 +44,12 @@ class DefParse {
 
 		if (!empty($this->defHeader)) {
 			$sectionPattern = "(".preg_quote($this->defHeader).".*?\n\n)s";
-		// Find all matches for header + text until double newline.	
+		// Find all matches for header + text until double newline.
 			preg_match_all($sectionPattern, $wikitext, $sectionMatches);
 			if ($sectionMatches) {
 				$defPattern = "/\n".str_replace(" ", "\s", preg_quote($this->defTag)).".*/";
 				foreach ($sectionMatches[0] as $value) {
-				// Find all matches for deftag + text until newline.	
+				// Find all matches for deftag + text until newline.
 					preg_match_all($defPattern, $value, $defMatches);
 					if ($defMatches) {
 						foreach ($defMatches[0] as $value) {
@@ -63,7 +63,7 @@ class DefParse {
 				die("No definitions section found.");
 			}
 		}
-		else {		
+		else {
 			$defPattern = "/\n".str_replace(" ", "\s", preg_quote($this->defTag)).".*/";
 			preg_match_all($defPattern, $wikitext, $matches);
 			if ($matches) {
@@ -85,7 +85,7 @@ class DefParse {
 		$strippedArray = str_replace("]]", "", $strippedArray);
 	// Remove definition identifier
 		$strippedArray = str_replace($this->defTag, "", $strippedArray);
-		
+
 		return $strippedArray;
 	}
 /***********************************************************************************/
