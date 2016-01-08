@@ -79,7 +79,7 @@ class PosParse {
 			return array_slice($tempPosResults, 0, $count);
 		}
 		else {
-			die("No POS found.");
+			return array();
 		}
 	}
 /***********************************************************************************/

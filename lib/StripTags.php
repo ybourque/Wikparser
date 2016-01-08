@@ -20,6 +20,7 @@ class StripTags {
 // public methods
 /***********************************************************************************/
 	public function stripTags($array, $langCode) {
+		$finalArray = array();
 		$tags_array = array("[", "]", "{", "}", "=");
 		foreach ($tags_array as $tag) {
 			$array = str_replace($tag, "", $array);

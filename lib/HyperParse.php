@@ -54,11 +54,11 @@ class HyperParse {
 				return array_slice($itemMatch[0], 0, $count);
 			}
 			else {
-				die("No hypernyms could be identified.");
+				return array();
 			}
 		}
 		else {
-			die("No listed hypernyms.");
+			return array();
 		}
 	}
 /***********************************************************************************/

@@ -60,7 +60,7 @@ class DefParse {
 				return array_slice($defArray, 0, $count);
 			}
 			else {
-				die("No definitions section found.");
+				return array();
 			}
 		}
 		else {

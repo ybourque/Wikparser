@@ -54,11 +54,11 @@ class SynParse {
 				return array_slice($itemMatch[0], 0, $count);
 			}
 			else {
-				die("No synonyms could be identified.");
+				return array();
 			}
 		}
 		else {
-			die("No listed synonyms.");
+			return array();
 		}
 	}
 /***********************************************************************************/
