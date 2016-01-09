@@ -1,4 +1,6 @@
 <?php
+namespace ybourque\Wikparser\lib;
+
 /***********************************************************************************/
 // This class is used to parse the wikitionary raw data in order to extract synonyms
 // for a given word. Synonyms are not systematically included in Wiktionary entries.
@@ -11,7 +13,7 @@ class SynParse {
 /***********************************************************************************/
 	private $langCode;		// language code (e.g. en, fr, da, etc.)
 	private $synHeader; 	// Synonyms header, set in config file
-	
+
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
@@ -27,20 +29,20 @@ class SynParse {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_syn($wikitext, $count) {
-		$synArray = $this->extract_syn($wikitext, $count);
-		return $this->strip_tags($synArray);
+	public function getSyn($wikitext, $count) {
+		$synArray = $this->extractSyn($wikitext, $count);
+		return $this->stripTags($synArray);
 	}
 /***********************************************************************************/
 // private methods
 /***********************************************************************************/
 // Extracts synonyms from wikitext
 /***********************************************************************************/
-	private function extract_syn($wikitext, $count) {
+	private function extractSyn($wikitext, $count) {
 		$synString = null;
 		$synPattern = "/$this->synHeader.*?\n\n/us";
 		$itemPattern = "/\[\[.*?\]\]/u";
-	
+
 	// If pattern returns results, then extract synonyms
 		if (preg_match_all($synPattern, $wikitext, $synMatch, PREG_PATTERN_ORDER) > 0) {
 		// There may be more than one synonym section. Fuse them together as string.
@@ -54,7 +56,7 @@ class SynParse {
 			else {
 				die("No synonyms could be identified.");
 			}
-		}	
+		}
 		else {
 			die("No listed synonyms.");
 		}
@@ -62,7 +64,7 @@ class SynParse {
 /***********************************************************************************/
 // Removes unnecessary string elements from results
 /***********************************************************************************/
-	private function strip_tags($synArray) {
+	private function stripTags($synArray) {
 		$strippedArray = $synArray;
 	// Remove first half of entries such as [[...:word]]
 		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);

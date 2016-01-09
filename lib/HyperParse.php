@@ -1,4 +1,6 @@
 <?php
+namespace ybourque\Wikparser\lib;
+
 /***********************************************************************************/
 // This class is used to parse the wikitionary raw data in order to extract hypernyms
 // for a given word. Hypernyms are infrequent in Wiktionary entries.
@@ -11,7 +13,7 @@ class HyperParse {
 /***********************************************************************************/
 	private $langCode;			// language code (e.g. en, fr, da, etc.)
 	private $hyperHeader;		// Hypernyms header, set in config file
-	
+
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
@@ -27,20 +29,20 @@ class HyperParse {
 /***********************************************************************************/
 // public methods
 /***********************************************************************************/
-	public function get_hyper($wikitext, $count) {
-		$hyperArray = $this->extract_hyper($wikitext, $count);
-		return $this->strip_tags($hyperArray);
+	public function getHyper($wikitext, $count) {
+		$hyperArray = $this->extractHyper($wikitext, $count);
+		return $this->stripTags($hyperArray);
 	}
 /***********************************************************************************/
 // private methods
 /***********************************************************************************/
 // Extracts hypernyms from wikitext
 /***********************************************************************************/
-	private function extract_hyper($wikitext, $count) {
-		$hyperString = null;	
+	private function extractHyper($wikitext, $count) {
+		$hyperString = null;
 		$hyperPattern = "/$this->hyperHeader.*?\n\n/us";
 		$itemPattern = "/\[\[.*?\]\]/u";
-	
+
 	// If pattern returns results, then extract hypernyms
 		if (preg_match_all($hyperPattern, $wikitext, $hyperMatch, PREG_PATTERN_ORDER) > 0) {
 		// There may be more than one hypernym section. Fuse them together as string.
@@ -54,7 +56,7 @@ class HyperParse {
 			else {
 				die("No hypernyms could be identified.");
 			}
-		}	
+		}
 		else {
 			die("No listed hypernyms.");
 		}
@@ -62,7 +64,7 @@ class HyperParse {
 /***********************************************************************************/
 // Removes unnecessary string elements from results
 /***********************************************************************************/
-	private function strip_tags($hyperArray) {
+	private function stripTags($hyperArray) {
 		$strippedArray = $hyperArray;
 	// Remove first half of entries such as [[...:word]]
 		$strippedArray = preg_replace("/\[\[.*?[|:]/u", "", $strippedArray);
