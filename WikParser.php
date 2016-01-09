@@ -26,7 +26,6 @@ class WikParser{
         $this->langParameters = $this->newLang($langCode);
 
         $wikitext = $this->getWikiText($this->langParameters, $this->source, $this->word);
-        var_dump($wikitext);
         $parsed = [];
         foreach ((array) $query as $q) {
             $parsed[$q] = $this->parseQuery($q, $wikitext);
