@@ -5,10 +5,7 @@ require dirname(__DIR__) . "/vendor/autoload.php";
 
 $wik = new WikParser();
 $queries = ['def', 'pos', 'syn', 'hyper', 'gender'];
-$parsed = [];
-foreach ($queries as $query) {
-    $parsed[$query] = $wik->getWordDefiniton('simplement', $query, 'fr');
-}
+$parsed = $wik->getWordDefiniton('simplement', $queries, 'fr');
 var_dump($parsed);
 
 /*

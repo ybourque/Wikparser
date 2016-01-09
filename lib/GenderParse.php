@@ -63,7 +63,7 @@ class GenderParse {
 			return array_unique($tempGenderResults);
 		}
 		else {
-			die("No gender found.");
+			return array();
 		}
 	}
 /***********************************************************************************/
