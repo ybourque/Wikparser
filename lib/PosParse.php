@@ -63,7 +63,7 @@ class PosParse {
 		}
 	// Else if the matches are part of a regular expression
 		else if ($this->posMatchType == "preg") {
-			preg_match_all($this->posPattern, $wikitext, $matches);
+			preg_match_all('/' . $this->posPattern . '/', $wikitext, $matches);
 			if (empty($matches[0]) !== true) {
 				foreach ($matches[0] as $value) {
 					$tempPosResults[] = str_replace($this->posExtraString, "", $value);
