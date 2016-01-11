@@ -11,7 +11,7 @@ class Fr extends AbstractLang
     protected $hyperHeader = "==== {{S|hyperonymes}} ====";
     protected $genderPattern = "(\{\{([mf]|mf)\??\}\})";
     protected $posMatchType = "preg";
-    protected $posPattern = "(\{\{\S\|[\d\w\s]+\|fr(\|num=[0-9])?\}\})u";
+    protected $posPattern = "(\{\{\S\|[\d\w\s]+\|fr(\|num=[0-9])?\}\})";
     protected $posArray = array();
     protected $posExtraString = "{{S|";
     protected $langHeader = 'fr}}\s*==';
