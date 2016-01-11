@@ -1,5 +1,8 @@
 <?php
 namespace ybourque\Wikparser\lib;
+
+use ybourque\Wikparser\lib\Lang\AbstractLang;
+
 /***********************************************************************************/
 // This class is used to extract all definitions for a word.
 // See the language.config.php file for setting language specific parameters.
@@ -9,21 +12,18 @@ class DefParse {
 /***********************************************************************************/
 // Variables
 /***********************************************************************************/
-	private $sectionPattern; 	// definitions header, set in config file
-	private $defTag;		// definitions tag, set in config file
+	private $sectionPattern;
+	private $defTag; // definitions tag, set in config file
 
 /***********************************************************************************/
 // construct
 /***********************************************************************************/
-	public function __construct($langParameters) {
-		if (empty($langParameters['defHeader']) && empty($langParameters['defTag'])) {
-			die("ERROR: Definition parameters are not set for this language in language.config.php.");
-		}
+	public function __construct(AbstractLang $langParameters) {
 
 		// Find all matches for header + text until double newline.
 		if ($langParameters['defHeader']) {
 			// use an explicit definition header string
-			$this->sectionPattern = '/('.preg_quote($this->defHeader).'.*?\n\n)/su';
+			$this->sectionPattern = '/('.preg_quote($langParameters['defHeader']).'.*?\n\n)/su';
 		} elseif ($langParameters['posPattern']) {
 			// some languages, such as french, have definitions after the part-of-speech
 			$this->sectionPattern = "/(" . $langParameters['posPattern'] . '.*?\n\n)/su';
