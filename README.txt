@@ -1,3 +1,9 @@
+﻿/****************************************************************/
+// NOTE: These instructions are no longer valid for this version
+// of the Wikparser. Please refer to the Wikparser-0.3a repo
+// for use with these instructions.
+/****************************************************************/
+
 Wikparser 0.3a
 =============
 
